@@ -1,0 +1,150 @@
+# --- Experiment configurations --------------------------------------------------------------------
+
+# experiment name, used as folder name
+experiment_name: TG_basins_Florida
+
+# place to store run directory (if empty runs are stored in $cwd$/runs/)
+run_dir: /home/mnagaraj/neuralhydrology/examples/08-Florida/results_msl/Static
+
+# files to specify training, validation and test basins (relative to code root or absolute path)
+train_basin_file: /home/mnagaraj/neuralhydrology/examples/08-Florida/TG_basin_list.txt
+validation_basin_file: /home/mnagaraj/neuralhydrology/examples/08-Florida/TG_basin_list.txt
+test_basin_file: /home/mnagaraj/neuralhydrology/examples/08-Florida/TG_basin_list.txt
+
+# training, validation and test time periods (format = 'dd/mm/yyyy')
+train_start_date: '01/01/1979'
+train_end_date: '31/12/2011'
+validation_start_date: '01/01/2012'
+validation_end_date: '31/12/2014'
+test_start_date: '01/01/2015'
+test_end_date: '31/12/2018'
+
+# fixed seed, leave empty to use a random seed
+seed: 123
+
+# which GPU (id) to use [in format of cuda:0, cuda:1 etc, or cpu or None]
+device: cuda:0
+
+# --- Validation configuration ---------------------------------------------------------------------
+
+# specify after how many epochs to perform validation
+validate_every: 25
+
+# specify how many random TG to use for validation
+validate_n_random_basins: 10
+
+# specify which metrics to calculate during validation (see codebase.evaluation.metrics)
+metrics:
+- RMSE
+- Pearson-r
+
+# --- Model configuration --------------------------------------------------------------------------
+
+# base model type [lstm, ealstm, cudalstm, embcudalstm, shortcutlstm, dropoutlstm, cudalstminitialh]
+# (has to match the if statement in modelzoo/__init__.py)
+model: ealstm
+
+# prediction head [regression, mdn, umal]. Define the head specific parameters below
+head: regression
+
+# ----> General settings <----
+
+# Number of cell states of the LSTM
+hidden_size: 128
+
+# Initial bias value of the forget gate
+initial_forget_bias: 3
+
+# Dropout applied to the output of the LSTM
+output_dropout: 0.4
+
+output_activation: linear
+
+# --- Training configuration -----------------------------------------------------------------------
+
+# specify optimizer [Adam, Adadelta]
+optimizer: Adam
+
+# specify loss [MSE, NSE, RMSE, UMALLoss, MDNLoss]
+loss: NSE
+
+# specify learning rates to use starting at specific epochs (0 is the initial learning rate)
+learning_rate:
+    0: 1e-3
+    1: 5e-4
+
+# Mini-batch size
+batch_size: 256
+
+# Number of training epochs
+epochs: 50
+
+# If True, clips norm of gradients
+clip_gradient_norm: 1
+
+# Defines which time steps are used to calculate the loss. Can't be larger than seq_length
+predict_last_n: 1
+
+# Length of the input sequence
+seq_length: 1
+
+# Number of parallel workers used in the data pipeline
+num_workers: 0
+
+# Log the training loss every n steps
+log_interval: 5
+
+# If true, writes logging results into tensorboard file
+log_tensorboard: True
+
+# Save model weights every n epochs
+save_weights_every: 1
+
+# Store the results of the validation to disk
+save_validation_results: True
+
+# --- Data configurations --------------------------------------------------------------------------
+
+dataset: generic
+
+# Path to data set
+data_dir: /home/mnagaraj/test_data_with_MSL_31
+
+# variables to use as time series input (names match the data file column headers)
+dynamic_inputs:
+- astr tide
+- MSL
+- PC1
+- PC2
+- PC3
+- PC4
+- PC5
+- PC6
+- PC7
+- PC8
+- PC9
+- PC10
+- PC11
+- PC12
+- PC13
+- PC14
+- PC15
+- PC16
+- PC17
+- PC18
+- PC19
+- PC20
+- PC21
+- PC22
+
+# which columns to use as target
+target_variables:
+- storm_surge
+
+static_attributes:
+- lat
+- lon
+- shelf_width
+- tidal_range
+- Near_slope
+- dc
